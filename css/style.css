@@ -163,17 +163,19 @@ body {
     padding: 0 max(12px, env(safe-area-inset-left, 0px)) 0 max(12px, env(safe-area-inset-right, 0px));
     z-index: 70;
     gap: 10px;
+    max-width: 920px;
+    margin: 0 auto;
 }
 
 
 #leftControls {
     display: flex;
-    gap: 14px;
+    gap: 10px;
 }
 
 .controlButton {
-    width: clamp(52px, 12vw, 78px);
-    height: clamp(52px, 12vw, 78px);
+    width: clamp(62px, 15vw, 88px);
+    height: clamp(62px, 15vw, 88px);
     background: linear-gradient(145deg, rgba(94, 187, 245, 0.28), rgba(38, 91, 133, 0.18));
     border: 1px solid rgba(120, 242, 255, 0.5);
     border-radius: 16px;
@@ -181,13 +183,14 @@ body {
     justify-content: center;
     align-items: center;
     color: var(--text);
-    font-size: 1.8rem;
+    font-size: clamp(1.1rem, 5.5vw, 1.8rem);
     font-family: 'Orbitron', sans-serif;
     user-select: none;
     touch-action: manipulation;
     backdrop-filter: blur(3px);
     box-shadow: inset 0 0 20px rgba(120, 242, 255, 0.1), 0 10px 26px rgba(0, 0, 0, 0.35);
     transition: transform 0.12s ease, filter 0.12s ease;
+    -webkit-user-select: none;
 }
 
 .controlButton.active {
@@ -201,20 +204,16 @@ body {
         padding: 0 max(10px, env(safe-area-inset-left, 0px)) 0 max(10px, env(safe-area-inset-right, 0px));
     }
     
-    .controlButton {
-        font-size: clamp(1rem, 4.8vw, 1.35rem);
-    }
-
     #leftControls {
-        gap: 8px;
+        gap: 10px;
     }
 }
 
 #fireButton {
-    width: clamp(108px, 27vw, 140px);
+    width: clamp(130px, 34vw, 170px);
     border-radius: 16px;
-    font-size: clamp(0.76rem, 3vw, 1rem);
-    letter-spacing: 0.09em;
+    font-size: clamp(0.86rem, 3.3vw, 1.05rem);
+    letter-spacing: 0.07em;
     background: linear-gradient(150deg, rgba(255, 102, 120, 0.5), rgba(187, 42, 67, 0.35));
     border-color: rgba(255, 136, 153, 0.75);
 }
@@ -351,8 +350,8 @@ body {
     }
 
     #fireButton {
-        width: clamp(96px, 31vw, 120px);
-        letter-spacing: 0.05em;
+        width: clamp(118px, 36vw, 138px);
+        letter-spacing: 0.04em;
     }
 }
 
@@ -368,14 +367,14 @@ body {
 }
 
 .compact-controls .controlButton {
-    width: clamp(48px, 13vw, 58px);
-    height: clamp(48px, 13vw, 58px);
-    font-size: clamp(0.92rem, 4.2vw, 1.2rem);
+    width: clamp(58px, 14.5vw, 70px);
+    height: clamp(58px, 14.5vw, 70px);
+    font-size: clamp(1rem, 4.6vw, 1.3rem);
     border-radius: 12px;
 }
 
 .compact-controls #fireButton {
-    width: clamp(90px, 30vw, 112px);
-    font-size: clamp(0.68rem, 2.7vw, 0.86rem);
+    width: clamp(108px, 34vw, 128px);
+    font-size: clamp(0.78rem, 3vw, 0.94rem);
     letter-spacing: 0.04em;
 }

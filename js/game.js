@@ -21,6 +21,13 @@ let bosses = [];
 
 let shakeFrames = 0;
 let shakePower = 0;
+let lastUiUpdateAt = 0;
+let lastBuffSecond = -1;
+
+const isLowPerfDevice = window.innerWidth <= 480 || window.innerHeight <= 760;
+const MAX_TOTAL_LASERS = 150;
+const MAX_PLAYER_LASERS = 56;
+const MAX_EXPLOSIONS = 28;
 
 const phaseToast = document.getElementById('phaseToast');
 const gameContainer = document.getElementById('gameContainer');
@@ -63,7 +70,7 @@ const audioSystem = {
 };
 
 function updateControlDensity() {
-    const compact = window.innerWidth <= 420 || window.innerHeight <= 700;
+    const compact = window.innerWidth <= 460 || window.innerHeight <= 780;
     document.body.classList.toggle('compact-controls', compact);
 }
 
@@ -80,7 +87,7 @@ function setupCanvas() {
         player.y = canvas.height - 100;
 
         if (stars.length === 0) {
-            createStarfield(160);
+            createStarfield(isLowPerfDevice ? 100 : 160);
         }
     }
 
@@ -186,11 +193,12 @@ function createBoss() {
 }
 
 function createExplosion(x, y, size) {
+    const particleCount = isLowPerfDevice ? 10 : 18;
     return {
         x,
         y,
         life: 26,
-        particles: Array(18).fill().map(() => ({
+        particles: Array(particleCount).fill().map(() => ({
             speed: Math.random() * 4 + 1,
             angle: Math.random() * Math.PI * 2,
             size: 1 + Math.random() * 2.2,
@@ -306,8 +314,10 @@ function drawPlayer() {
 function drawLaser(laser) {
     ctx.save();
     ctx.fillStyle = laser.isEnemy ? '#ff5d7d' : '#ffd166';
-    ctx.shadowColor = laser.isEnemy ? '#ff5d7d' : '#ffd166';
-    ctx.shadowBlur = 8;
+    if (!isLowPerfDevice) {
+        ctx.shadowColor = laser.isEnemy ? '#ff5d7d' : '#ffd166';
+        ctx.shadowBlur = 8;
+    }
     ctx.fillRect(laser.x, laser.y, laser.width, laser.height);
     ctx.restore();
 }
@@ -717,12 +727,55 @@ function updatePowerUps() {
 }
 
 function updateExplosions() {
+    if (explosions.length > MAX_EXPLOSIONS) {
+        explosions.splice(0, explosions.length - MAX_EXPLOSIONS);
+    }
+
     for (let i = explosions.length - 1; i >= 0; i--) {
         explosions[i].life--;
         if (explosions[i].life <= 0) {
             explosions.splice(i, 1);
         }
     }
+}
+
+function trimLasers() {
+    if (player.lasers.length <= MAX_TOTAL_LASERS) {
+        return;
+    }
+
+    const overflow = player.lasers.length - MAX_TOTAL_LASERS;
+    let removed = 0;
+
+    for (let i = 0; i < player.lasers.length && removed < overflow; i++) {
+        if (player.lasers[i].isEnemy) {
+            player.lasers.splice(i, 1);
+            i--;
+            removed++;
+        }
+    }
+
+    if (removed < overflow) {
+        player.lasers.splice(0, overflow - removed);
+    }
+}
+
+function maybeRefreshTimedUI() {
+    const now = Date.now();
+    if (now - lastUiUpdateAt < 200) {
+        return;
+    }
+
+    const weaponSec = Math.max(0, Math.ceil((player.weaponExpiresAt - now) / 1000));
+    const shieldSec = Math.max(0, Math.ceil((player.shieldExpiresAt - now) / 1000));
+    const key = weaponSec * 100 + shieldSec;
+
+    if (key !== lastBuffSecond) {
+        lastBuffSecond = key;
+        updateUI();
+    }
+
+    lastUiUpdateAt = now;
 }
 
 function getRect(obj, centered) {
@@ -1067,6 +1120,17 @@ function resetGame() {
 }
 
 function pushPlayerLaser(vx, width, height, speed, pierce) {
+    let playerShotCount = 0;
+    for (let i = 0; i < player.lasers.length; i++) {
+        if (!player.lasers[i].isEnemy) {
+            playerShotCount++;
+        }
+    }
+
+    if (playerShotCount >= MAX_PLAYER_LASERS) {
+        return;
+    }
+
     player.lasers.push({
         x: player.x - width / 2,
         y: player.y - player.height / 2 - 12,
@@ -1119,6 +1183,7 @@ function gameLoop() {
     updateLifeBonuses();
     updatePowerUps();
     updateExplosions();
+    trimLasers();
     checkCollisions();
 
     spawnEnemies();
@@ -1139,7 +1204,7 @@ function gameLoop() {
 
     ctx.restore();
 
-    updateUI();
+    maybeRefreshTimedUI();
     requestAnimationFrame(gameLoop);
 }
 
@@ -1369,6 +1434,8 @@ function setupControls() {
     };
 
     const bindPressEvents = (button, onPress, onRelease) => {
+        const supportsPointer = 'PointerEvent' in window;
+
         const press = (e) => {
             if (e.cancelable) {
                 e.preventDefault();
@@ -1384,18 +1451,20 @@ function setupControls() {
             onRelease();
         };
 
-        button.addEventListener('pointerdown', press);
-        button.addEventListener('pointerup', release);
-        button.addEventListener('pointercancel', release);
-        button.addEventListener('pointerleave', release);
+        if (supportsPointer) {
+            button.addEventListener('pointerdown', press);
+            button.addEventListener('pointerup', release);
+            button.addEventListener('pointercancel', release);
+            button.addEventListener('pointerleave', release);
+        } else {
+            button.addEventListener('touchstart', press, { passive: false });
+            button.addEventListener('touchend', release, { passive: false });
+            button.addEventListener('touchcancel', release, { passive: false });
 
-        button.addEventListener('touchstart', press, { passive: false });
-        button.addEventListener('touchend', release, { passive: false });
-        button.addEventListener('touchcancel', release, { passive: false });
-
-        button.addEventListener('mousedown', press);
-        button.addEventListener('mouseup', release);
-        button.addEventListener('mouseleave', release);
+            button.addEventListener('mousedown', press);
+            button.addEventListener('mouseup', release);
+            button.addEventListener('mouseleave', release);
+        }
     };
 
     bindPressEvents(leftButton, () => pressLeft(true), () => pressLeft(false));
