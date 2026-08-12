@@ -1,0 +1,381 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --bg-top: #061320;
+    --bg-mid: #0d2238;
+    --bg-bottom: #04080f;
+    --hud: rgba(5, 12, 24, 0.7);
+    --hud-border: rgba(141, 211, 255, 0.35);
+    --cyan: #78f2ff;
+    --gold: #ffd166;
+    --danger: #ff4d6d;
+    --text: #edf7ff;
+}
+
+body {
+    overflow: hidden;
+    touch-action: none;
+    font-family: 'Rajdhani', sans-serif;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(120, 242, 255, 0.08), transparent 35%),
+        radial-gradient(circle at 80% 80%, rgba(255, 209, 102, 0.08), transparent 30%),
+        linear-gradient(180deg, var(--bg-top), var(--bg-mid) 55%, var(--bg-bottom));
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+}
+
+#gameContainer {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    display: block;
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* Telas de Interface */
+#menuScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(160deg, rgba(5, 10, 18, 0.85), rgba(4, 16, 28, 0.92)),
+        url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986') center/cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+}
+
+#gameTitle {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+    color: var(--cyan);
+    text-shadow: 0 0 18px rgba(120, 242, 255, 0.7);
+    text-align: center;
+}
+
+#menuSubtitle {
+    margin-bottom: 1.8rem;
+    font-size: clamp(1rem, 3.2vw, 1.4rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(237, 247, 255, 0.8);
+}
+
+.menuButton {
+    padding: 14px 30px;
+    margin: 10px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.09em;
+    background: linear-gradient(180deg, #1f6fa0, #104665);
+    border: 1px solid rgba(120, 242, 255, 0.55);
+    border-radius: 14px;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    width: 240px;
+    text-align: center;
+    touch-action: manipulation;
+    text-transform: uppercase;
+}
+
+.menuButton:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+.menuButton:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 12px 30px rgba(18, 116, 170, 0.35);
+}
+
+#instructionsScreen, #gameOverScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at top, rgba(120, 242, 255, 0.08), transparent 45%),
+        rgba(2, 6, 12, 0.94);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    padding: 20px;
+    text-align: center;
+}
+
+#instructionsText {
+    margin-bottom: 30px;
+    max-width: min(90vw, 650px);
+    line-height: 1.7;
+    font-size: 1.12rem;
+    color: rgba(237, 247, 255, 0.88);
+}
+
+#instructionsScreen h2,
+#gameOverText {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+}
+
+#finalScore {
+    font-size: 1.25rem;
+    margin-bottom: 18px;
+}
+
+/* Controles */
+#controls {
+    position: absolute;
+    left: 0;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 max(12px, env(safe-area-inset-left, 0px)) 0 max(12px, env(safe-area-inset-right, 0px));
+    z-index: 70;
+    gap: 10px;
+}
+
+
+#leftControls {
+    display: flex;
+    gap: 14px;
+}
+
+.controlButton {
+    width: clamp(52px, 12vw, 78px);
+    height: clamp(52px, 12vw, 78px);
+    background: linear-gradient(145deg, rgba(94, 187, 245, 0.28), rgba(38, 91, 133, 0.18));
+    border: 1px solid rgba(120, 242, 255, 0.5);
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text);
+    font-size: 1.8rem;
+    font-family: 'Orbitron', sans-serif;
+    user-select: none;
+    touch-action: manipulation;
+    backdrop-filter: blur(3px);
+    box-shadow: inset 0 0 20px rgba(120, 242, 255, 0.1), 0 10px 26px rgba(0, 0, 0, 0.35);
+    transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.controlButton.active {
+    transform: scale(0.95);
+    filter: brightness(1.25);
+}
+/* Ajuste específico para mobile */
+@media (max-width: 768px) {
+    #controls {
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        padding: 0 max(10px, env(safe-area-inset-left, 0px)) 0 max(10px, env(safe-area-inset-right, 0px));
+    }
+    
+    .controlButton {
+        font-size: clamp(1rem, 4.8vw, 1.35rem);
+    }
+
+    #leftControls {
+        gap: 8px;
+    }
+}
+
+#fireButton {
+    width: clamp(108px, 27vw, 140px);
+    border-radius: 16px;
+    font-size: clamp(0.76rem, 3vw, 1rem);
+    letter-spacing: 0.09em;
+    background: linear-gradient(150deg, rgba(255, 102, 120, 0.5), rgba(187, 42, 67, 0.35));
+    border-color: rgba(255, 136, 153, 0.75);
+}
+
+/* Informações do Jogo */
+#gameInfo {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    color: var(--text);
+    font-size: 1rem;
+    background: var(--hud);
+    border: 1px solid var(--hud-border);
+    padding: 8px 12px;
+    border-radius: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.infoBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 78px;
+    padding: 2px 6px;
+}
+
+.infoLabel {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: rgba(237, 247, 255, 0.65);
+}
+
+#scoreDisplay,
+#phaseDisplay,
+#livesDisplay,
+#comboDisplay {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+}
+
+#comboDisplay {
+    color: var(--gold);
+}
+
+#weaponDisplay {
+    color: #9bffbf;
+    font-size: 0.9rem;
+}
+
+#shieldDisplay {
+    color: #78f2ff;
+    font-size: 0.9rem;
+}
+
+#phaseToast {
+    position: absolute;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    z-index: 60;
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 209, 102, 0.6);
+    background: rgba(26, 17, 7, 0.75);
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    font-family: 'Orbitron', sans-serif;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+#phaseToast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+#developer {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-size: 0.8rem;
+    color: rgba(237, 247, 255, 0.55);
+    z-index: 50;
+}
+
+@media (max-width: 640px) {
+    #gameInfo {
+        top: 8px;
+        gap: 4px;
+        padding: 6px 8px;
+    }
+
+    .infoBlock {
+        min-width: 54px;
+    }
+
+    .infoLabel {
+        font-size: 0.62rem;
+    }
+
+    #scoreDisplay,
+    #phaseDisplay,
+    #livesDisplay,
+    #comboDisplay,
+    #weaponDisplay,
+    #shieldDisplay {
+        font-size: 0.84rem;
+    }
+
+    #developer {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    #controls {
+        gap: 6px;
+        padding: 0 max(8px, env(safe-area-inset-left, 0px)) 0 max(8px, env(safe-area-inset-right, 0px));
+    }
+
+    #leftControls {
+        gap: 6px;
+    }
+
+    .controlButton {
+        border-radius: 12px;
+    }
+
+    #fireButton {
+        width: clamp(96px, 31vw, 120px);
+        letter-spacing: 0.05em;
+    }
+}
+
+.compact-controls #controls {
+    gap: 6px;
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+}
+
+.compact-controls #leftControls {
+    gap: 6px;
+}
+
+.compact-controls .controlButton {
+    width: clamp(48px, 13vw, 58px);
+    height: clamp(48px, 13vw, 58px);
+    font-size: clamp(0.92rem, 4.2vw, 1.2rem);
+    border-radius: 12px;
+}
+
+.compact-controls #fireButton {
+    width: clamp(90px, 30vw, 112px);
+    font-size: clamp(0.68rem, 2.7vw, 0.86rem);
+    letter-spacing: 0.04em;
+}
