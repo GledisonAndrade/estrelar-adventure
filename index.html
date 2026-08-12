@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Adventure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Telas de Interface -->
+        <div id="menuScreen">
+            <h1 id="gameTitle">SPACE ADVENTURE</h1>
+            <p id="menuSubtitle">Combate interestelar com ritmo arcade</p>
+            <button class="menuButton" id="startButton">INICIAR</button>
+            <button class="menuButton" id="instructionsButton">INSTRUÇÕES</button>
+        </div>
+        
+        <div id="instructionsScreen">
+            <h2>INSTRUÇÕES</h2>
+            <div id="instructionsText">
+                <p>Use os botões da esquerda ou as setas do teclado para mover sua nave.</p>
+                <p>Segure ATIRAR (ou barra de espaço) para tiro contínuo.</p>
+                <p>Colete corações para ganhar vidas extras.</p>
+                <p>Mantenha a sequência de abates para subir o multiplicador de combo.</p>
+                <p>Ao atingir a meta de pontos da fase, um CHEFÃO aparece. Derrote-o para avançar.</p>
+                <p>Power-ups: TIRO TRIPLO, ESCUDO e LASER PERFURANTE.</p>
+                <p>Pressione M para ativar/desativar o áudio.</p>
+            </div>
+            <button class="menuButton" id="backButton">VOLTAR</button>
+        </div>
+        
+        <div id="gameOverScreen">
+            <div id="gameOverText">FIM DE JOGO</div>
+            <div id="finalScore">Pontuação: 0</div>
+            <button class="menuButton" id="restartButton">JOGAR NOVAMENTE</button>
+        </div>
+        
+        <!-- Controles do Jogo -->
+        <div id="controls">
+            <div id="leftControls">
+                <div class="controlButton" id="leftButton">←</div>
+                <div class="controlButton" id="rightButton">→</div>
+            </div>
+            <div class="controlButton" id="fireButton">ATIRAR</div>
+        </div>
+        
+        <!-- Informações do Jogo -->
+        <div id="gameInfo">
+            <div class="infoBlock">
+                <span class="infoLabel">Pontos</span>
+                <span id="scoreDisplay">0</span>
+            </div>
+            <div class="infoBlock">
+                <span class="infoLabel">Fase</span>
+                <span id="phaseDisplay">1</span>
+            </div>
+            <div class="infoBlock">
+                <span class="infoLabel">Vidas</span>
+                <span id="livesDisplay">3</span>
+            </div>
+            <div class="infoBlock">
+                <span class="infoLabel">Combo</span>
+                <span id="comboDisplay">x1</span>
+            </div>
+            <div class="infoBlock">
+                <span class="infoLabel">Arma</span>
+                <span id="weaponDisplay">Padrão</span>
+            </div>
+            <div class="infoBlock">
+                <span class="infoLabel">Escudo</span>
+                <span id="shieldDisplay">Off</span>
+            </div>
+        </div>
+
+        <div id="phaseToast" aria-live="polite"></div>
+        
+        <div id="developer">Desenvolvido por GLEDISON ARRUDA ANDRADE</div>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>
