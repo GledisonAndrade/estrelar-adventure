@@ -155,22 +155,16 @@ body {
 #controls {
     position: absolute;
     left: 0;
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: flex-end;
     padding: 0 max(12px, env(safe-area-inset-left, 0px)) 0 max(12px, env(safe-area-inset-right, 0px));
     z-index: 70;
-    gap: 10px;
+    gap: 0;
     max-width: 920px;
     margin: 0 auto;
-}
-
-
-#leftControls {
-    display: flex;
-    gap: 10px;
 }
 
 .controlButton {
@@ -200,22 +194,19 @@ body {
 /* Ajuste específico para mobile */
 @media (max-width: 768px) {
     #controls {
-        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px));
         padding: 0 max(10px, env(safe-area-inset-left, 0px)) 0 max(10px, env(safe-area-inset-right, 0px));
-    }
-    
-    #leftControls {
-        gap: 10px;
     }
 }
 
 #fireButton {
-    width: clamp(130px, 34vw, 170px);
+    width: clamp(150px, 38vw, 190px);
     border-radius: 16px;
-    font-size: clamp(0.86rem, 3.3vw, 1.05rem);
+    font-size: clamp(0.94rem, 3.5vw, 1.12rem);
     letter-spacing: 0.07em;
     background: linear-gradient(150deg, rgba(255, 102, 120, 0.5), rgba(187, 42, 67, 0.35));
     border-color: rgba(255, 136, 153, 0.75);
+    box-shadow: inset 0 0 20px rgba(255, 177, 189, 0.22), 0 14px 30px rgba(112, 18, 38, 0.42);
 }
 
 /* Informações do Jogo */
@@ -341,29 +332,21 @@ body {
         padding: 0 max(8px, env(safe-area-inset-left, 0px)) 0 max(8px, env(safe-area-inset-right, 0px));
     }
 
-    #leftControls {
-        gap: 6px;
-    }
-
     .controlButton {
         border-radius: 12px;
     }
 
     #fireButton {
-        width: clamp(118px, 36vw, 138px);
+        width: clamp(130px, 44vw, 152px);
         letter-spacing: 0.04em;
     }
 }
 
 .compact-controls #controls {
-    gap: 6px;
+    gap: 0;
     padding-left: max(8px, env(safe-area-inset-left, 0px));
     padding-right: max(8px, env(safe-area-inset-right, 0px));
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-}
-
-.compact-controls #leftControls {
-    gap: 6px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
 .compact-controls .controlButton {
@@ -374,7 +357,7 @@ body {
 }
 
 .compact-controls #fireButton {
-    width: clamp(108px, 34vw, 128px);
+    width: clamp(124px, 40vw, 146px);
     font-size: clamp(0.78rem, 3vw, 0.94rem);
     letter-spacing: 0.04em;
 }

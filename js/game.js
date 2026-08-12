@@ -50,6 +50,8 @@ const player = {
     shootDelay: 280,
     moveLeft: false,
     moveRight: false,
+    touchSteering: false,
+    targetX: null,
     firing: false,
     weaponMode: 'normal',
     weaponExpiresAt: 0,
@@ -583,6 +585,13 @@ function updatePlayerBuffs() {
 function updatePlayer() {
     updatePlayerBuffs();
 
+    if (player.touchSteering && player.targetX !== null) {
+        const delta = player.targetX - player.x;
+        const maxStep = player.speed * 1.35;
+        const step = Math.max(-maxStep, Math.min(maxStep, delta));
+        player.x += step;
+    }
+
     if (player.moveLeft && player.x > player.width / 2) {
         player.x -= player.speed;
     }
@@ -590,6 +599,8 @@ function updatePlayer() {
     if (player.moveRight && player.x < canvas.width - player.width / 2) {
         player.x += player.speed;
     }
+
+    player.x = Math.max(player.width / 2, Math.min(canvas.width - player.width / 2, player.x));
 
     if (player.firing) {
         shootLaser();
@@ -1100,6 +1111,8 @@ function resetGame() {
     player.lastShot = 0;
     player.moveLeft = false;
     player.moveRight = false;
+    player.touchSteering = false;
+    player.targetX = null;
     player.firing = false;
     player.weaponMode = 'normal';
     player.weaponExpiresAt = 0;
@@ -1403,26 +1416,20 @@ function toggleMute() {
 }
 
 function setupControls() {
-    const leftButton = document.getElementById('leftButton');
-    const rightButton = document.getElementById('rightButton');
     const fireButton = document.getElementById('fireButton');
 
     const pressLeft = (active) => {
         player.moveLeft = active;
         if (active) {
             player.moveRight = false;
-            setButtonActive(rightButton, false);
         }
-        setButtonActive(leftButton, active);
     };
 
     const pressRight = (active) => {
         player.moveRight = active;
         if (active) {
             player.moveLeft = false;
-            setButtonActive(leftButton, false);
         }
-        setButtonActive(rightButton, active);
     };
 
     const pressFire = (active) => {
@@ -1467,9 +1474,87 @@ function setupControls() {
         }
     };
 
-    bindPressEvents(leftButton, () => pressLeft(true), () => pressLeft(false));
-    bindPressEvents(rightButton, () => pressRight(true), () => pressRight(false));
     bindPressEvents(fireButton, () => pressFire(true), () => pressFire(false));
+
+    const setTouchTarget = (clientX) => {
+        player.targetX = Math.max(player.width / 2, Math.min(canvas.width - player.width / 2, clientX));
+    };
+
+    const startTouchSteering = (clientX) => {
+        if (!gameRunning) {
+            return;
+        }
+        player.touchSteering = true;
+        setTouchTarget(clientX);
+    };
+
+    const moveTouchSteering = (clientX) => {
+        if (!player.touchSteering || !gameRunning) {
+            return;
+        }
+        setTouchTarget(clientX);
+    };
+
+    const stopTouchSteering = () => {
+        player.touchSteering = false;
+        player.targetX = null;
+    };
+
+    const supportsPointer = 'PointerEvent' in window;
+    if (supportsPointer) {
+        gameContainer.addEventListener('pointerdown', (e) => {
+            if (fireButton.contains(e.target)) {
+                return;
+            }
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            initAudio();
+            startTouchSteering(e.clientX);
+        });
+
+        gameContainer.addEventListener('pointermove', (e) => {
+            if (!player.touchSteering) {
+                return;
+            }
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            moveTouchSteering(e.clientX);
+        });
+
+        window.addEventListener('pointerup', stopTouchSteering);
+        window.addEventListener('pointercancel', stopTouchSteering);
+    } else {
+        gameContainer.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            if (!touch) {
+                return;
+            }
+            if (fireButton.contains(e.target)) {
+                return;
+            }
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            initAudio();
+            startTouchSteering(touch.clientX);
+        }, { passive: false });
+
+        gameContainer.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            if (!touch || !player.touchSteering) {
+                return;
+            }
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            moveTouchSteering(touch.clientX);
+        }, { passive: false });
+
+        gameContainer.addEventListener('touchend', stopTouchSteering, { passive: true });
+        gameContainer.addEventListener('touchcancel', stopTouchSteering, { passive: true });
+    }
 
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'm') {
@@ -1505,6 +1590,7 @@ function setupControls() {
         pressLeft(false);
         pressRight(false);
         pressFire(false);
+        stopTouchSteering();
     });
 }
 
